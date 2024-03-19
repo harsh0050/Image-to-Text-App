@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct Image_to_Text_AppApp: App {
+    @State var displayCaptureImage = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SelectImageView()
         }
     }
 }
