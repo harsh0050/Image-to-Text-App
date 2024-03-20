@@ -11,47 +11,40 @@ import UIKit
 
 struct CaptureImageView: View {
     @StateObject var viewModel: CameraViewModel = CameraViewModel()
-    @State var navigationPath: [UIImage] = []
-    
+    @Binding var navPath: NavigationPath
     var body: some View {
-        NavigationStack{
-            ZStack{
-                if(self.viewModel.isCameraAvailable){
-                    PreviewView(cameraViewModel: self.viewModel)
-                }else{
-                    
-                    ZStack(alignment: .center){
-                        Color(.black)
-                        Text("No Camera Found.").foregroundStyle(.white)
-                    }.ignoresSafeArea()
-                }
+        ZStack{
+            if(self.viewModel.isCameraAvailable){
+                PreviewView(cameraViewModel: self.viewModel)
+            }else{
                 
-                VStack{
-                    Spacer()
-                    Button(action: {
-                        if(self.viewModel.isCameraAvailable){
-                            viewModel.takePic()
-                        }
-                    }, label: {
-                        Image(systemName: "camera.circle").tint(.white).font(.system(size: 50))
-                    }).padding(.bottom, 30)
-                }
-                
-                
-            }.task {
-                await self.viewModel.setUp()
-                
-            }.onChange(of: self.viewModel.capturedImg){
-                guard viewModel.capturedImg != nil else {
-                    return
-                }
-                navigationPath.append(viewModel.capturedImg!)
-                
-            }.navigationDestination(for: UIImage.self) { uiImage in
-                if let cgImg = uiImage.cgImage{
-                    DisplayTextView(image: cgImg)
-                }
+                ZStack(alignment: .center){
+                    Color(.black)
+                    Text("No Camera Found.").foregroundStyle(.white)
+                }.ignoresSafeArea()
             }
+            
+            VStack{
+                Spacer()
+                Button(action: {
+                    if(self.viewModel.isCameraAvailable){
+                        viewModel.takePic()
+                    }
+                }, label: {
+                    Image(systemName: "camera.circle").tint(.white).font(.system(size: 50))
+                }).padding(.bottom, 30)
+            }
+            
+            
+        }.task {
+            await self.viewModel.setUp()
+            
+        }.onChange(of: self.viewModel.capturedImg){
+            guard viewModel.capturedImg != nil else {
+                return
+            }
+            navPath.append(viewModel.capturedImg!)
+            
         }
     }
 }
@@ -74,5 +67,5 @@ struct PreviewView : UIViewRepresentable{
 
 
 #Preview {
-    CaptureImageView()
+    CaptureImageView(navPath: .constant(.init()))
 }

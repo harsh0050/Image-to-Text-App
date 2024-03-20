@@ -13,7 +13,7 @@ struct SelectImageView: View {
     
     @StateObject var viewModel: SelectImageViewModel = SelectImageViewModel()
     
-    @State private var path = [UIImage]()
+    @State private var path : NavigationPath = .init()
     
     var body: some View {
         NavigationStack(path: $path){
@@ -39,6 +39,7 @@ struct SelectImageView: View {
                     IconButton(iconSystemName: "camera.fill") {
                         Text("Capture image from Camera")
                     }.onTapGesture {
+                        self.path.append("")
                         //Camera function
                     }
                     Spacer().frame(height: 20)
@@ -48,9 +49,12 @@ struct SelectImageView: View {
                         DisplayTextView(image: cgImg)
                     }
                 })
+                .navigationDestination(for: String.self, destination: { str in
+                    CaptureImageView(navPath: self.$path)
+                })
                 .onChange(of: viewModel.loadedImage) {
                     if let loadedImage: UIImage = viewModel.loadedImage{
-                        self.path = [loadedImage]
+                        self.path.append(loadedImage)
                     }
                 }
             }
